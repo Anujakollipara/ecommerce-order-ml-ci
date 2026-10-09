@@ -2,7 +2,7 @@
 import json
 import sys
 
-MINIMUM_ACCURACY = 0.35
+MINIMUM_ACCURACY = 0.99
 
 with open("metrics.json", "r") as file:
     metrics = json.load(file)
