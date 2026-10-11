@@ -1,5 +1,5 @@
 
-name: E-commerce ML CI
+name: E-commerce ML Continuous Delivery
 
 on:
   push:
@@ -14,7 +14,7 @@ permissions:
   contents: read
 
 jobs:
-  train-and-test:
+  train-test-deliver:
     runs-on: ubuntu-latest
 
     steps:
@@ -26,7 +26,10 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install ML dependencies
+      - name: Upgrade pip
+        run: python -m pip install --upgrade pip
+
+      - name: Install dependencies
         run: python -m pip install -r requirements.txt
 
       - name: Train e-commerce model
@@ -36,14 +39,30 @@ jobs:
         run: python quality_gate.py
 
       - name: Run automated ML tests
-        run: python -m unittest discover -v
+        run: python -m unittest test_ml_pipeline.py -v
 
-      - name: Upload validated ML artifacts
+      - name: Run prediction API tests
+        run: python -m unittest test_app.py -v
+
+      - name: Prepare release candidate
+        run: |
+          mkdir -p release_candidate
+          cp app.py release_candidate/
+          cp ecommerce_model.pkl release_candidate/
+          cp metrics.json release_candidate/
+          cp requirements.txt release_candidate/
+          printf '%s\n' \
+            'E-commerce Order Prediction Application' \
+            'Install dependencies: pip install -r requirements.txt' \
+            'Start API: python app.py' \
+            'Health endpoint: GET /' \
+            'Prediction endpoint: POST /predict' \
+            > release_candidate/DEPLOYMENT.txt
+
+      - name: Upload release candidate
         uses: actions/upload-artifact@v4
         with:
-          name: ecommerce-ml-artifacts
-          path: |
-            ecommerce_model.pkl
-            metrics.json
+          name: ecommerce-ml-release
+          path: release_candidate/
           if-no-files-found: error
           retention-days: 7
