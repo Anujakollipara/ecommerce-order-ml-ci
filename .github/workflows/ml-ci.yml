@@ -44,7 +44,7 @@ jobs:
       - name: Run prediction API tests
         run: python -m unittest test_app.py -v
 
-            - name: Prepare release candidate
+      - name: Prepare release candidate
         run: |
           mkdir -p release_candidate
           cp app.py release_candidate/
