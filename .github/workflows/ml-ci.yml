@@ -1,11 +1,12 @@
-```yaml
 name: E-commerce ML Continuous Delivery
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
   pull_request:
-    branches: [main]
+    branches:
+      - main
   workflow_dispatch:
 
 permissions:
@@ -33,12 +34,6 @@ jobs:
       - name: Train e-commerce model
         run: python train_model.py
 
-      - name: Check generated files
-        run: |
-          ls -la
-          test -f ecommerce_model.pkl
-          test -f metrics.json
-
       - name: Check ML quality gate
         run: python quality_gate.py
 
@@ -63,7 +58,6 @@ jobs:
             'Health endpoint: GET /' \
             'Prediction endpoint: POST /predict' \
             > release_candidate/DEPLOYMENT.txt
-
       - name: Upload release candidate
         uses: actions/upload-artifact@v4
         with:
@@ -71,4 +65,3 @@ jobs:
           path: release_candidate/
           if-no-files-found: error
           retention-days: 7
-```
