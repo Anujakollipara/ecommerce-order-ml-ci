@@ -1,13 +1,11 @@
-
+```yaml
 name: E-commerce ML Continuous Delivery
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
   pull_request:
-    branches:
-      - main
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -34,6 +32,12 @@ jobs:
 
       - name: Train e-commerce model
         run: python train_model.py
+
+      - name: Check generated files
+        run: |
+          ls -la
+          test -f ecommerce_model.pkl
+          test -f metrics.json
 
       - name: Check ML quality gate
         run: python quality_gate.py
@@ -67,3 +71,4 @@ jobs:
           path: release_candidate/
           if-no-files-found: error
           retention-days: 7
+```
